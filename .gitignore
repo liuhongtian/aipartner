@@ -36,6 +36,7 @@ build/
 
 ### Node.js
 node_modules/
+dist/
 
 ### Mac jungle ###
 **/.DS_Store
