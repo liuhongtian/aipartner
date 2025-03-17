@@ -1,0 +1,9 @@
+services:
+  aipartner:
+    image: hwjdk:21
+    ports:
+      - "8080:8080"
+    restart: always
+    volumes:
+      - .:/jars
+    command: ["-Xmx1024m", "-jar", "/jars/aipartner.jar"]

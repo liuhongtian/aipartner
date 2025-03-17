@@ -1,0 +1,40 @@
+[
+    {
+        "type": "function",
+        "function": {
+            "description": "查找页面",
+            "name": "Page",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "pageid": {
+                    "type": "string",
+                    "description": "页面ID，例如：123，site"
+                    }
+                },
+                "required": ["pageid"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "description": "计算器",
+            "name": "Calculator",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "numbers": {
+                    "type": "string",
+                    "description": "参与计算的数字，例如：[1, 2, 3]"
+                    },
+                    "operation": {
+                    "type": "string",
+                    "description": "计算操作，例如：add, subtract, multiply, divide"
+                    }
+                },
+                "required": ["numbers", "operation"]
+            }
+        }
+    }
+]

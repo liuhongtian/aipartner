@@ -1,0 +1,15 @@
+openai:
+  base-url: https://api.deepseek.com
+  api-key: sk-27458ffa9db74d6096b2462dcc4b0b62
+  #base-url: https://dashscope.aliyuncs.com/compatible-mode
+  #api-key: sk-3d5122d342aa47d68ca9ed6aafde1d37
+
+anythingllm:
+  base-url: http://www.liuhongtian.com:23001
+  api-key: 9ZCGHF0-WR6MA0B-HQ8Q2S4-HQ39KQK
+  #mbp api-key: AW6F4YM-9ZXMMS0-PM025QX-W1CXSZ3
+  #pc api-key: SFVWXJ5-F0XM63A-KCVS6VY-6PZXX9M
+  #aliyun api-key: 9ZCGHF0-WR6MA0B-HQ8Q2S4-HQ39KQK
+
+cors:
+  allowed-origin-patterns: http://localhost:*,https://localhost:*,http://*:*,https://*:*,http://svr39.bjhwsj.com

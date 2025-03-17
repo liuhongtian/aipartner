@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI助手对话示例</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .instructions {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h2 {
+            color: #495057;
+            margin-top: 0;
+        }
+
+        .instructions ul {
+            margin-bottom: 0;
+        }
+
+        .workspace-selector {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f1f8ff;
+            border-radius: 5px;
+        }
+
+        .workspace-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #0056b3;
+        }
+
+        .workspace-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+    </style>
+    <!-- 引入聊天组件脚本 -->
+    <script src="/js/chat-widget.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>AI助手对话示例</h1>
+        
+        <div class="instructions">
+            <h2>使用说明</h2>
+            <ul>
+                <li>点击右下角的聊天图标打开对话窗口</li>
+                <li>打开对话窗口时，再次点击右下角的聊天图标关闭对话窗口</li>
+                <li>拖拽对话窗口左上角，调整窗口大小</li>
+                <li>点击“x”按钮关闭对话窗口</li>
+                <li>点击“+”按钮最大化对话窗口</li>
+                <li>点击“-”按钮最小化对话窗口</li>
+                <li>点击“t”按钮显示/隐藏工具栏</li>
+                <li>显示工具栏后，当前知识库名称会显示在工具栏左侧，点击知识库名称可以切换知识库</li>
+                <li>在输入框中输入您的问题（注意选择正确的知识库）否则AI助手将无法回答您的问题</li>
+                <li>按Shift+回车键或点击发送按钮发送消息</li>
+                <li>AI助手将根据选定的工作空间内容回答您的问题</li>
+                <li>回答中可能包含相关的参考来源，点击相应的参考来源可以查看详细内容</li>
+            </ul>
+        </div>
+        <div><center><a href="https://beian.miit.gov.cn">京ICP备2024052258号-2</a></center></div>
+    </div>
+
+    <script>
+        // 从URL参数获取用户名
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 获取URL中的用户名参数
+        const username = getUrlParameter('username');
+        // 获取URL中的工作空间参数（必须是slug，不是显示名称！）
+        const workspace = getUrlParameter('workspace');
+
+        // URL中的API服务器地址与端口，不设置的话，缺省值为空字符串，则页面与API服务位于同一服务器
+        //const apibase = "http://localhost:8080";
+
+        // 聊天组件
+        let chatWidget;
+        
+        // 初始化聊天组件
+        document.addEventListener('DOMContentLoaded', () => {
+            // 如果已存在聊天组件，先移除
+            if (chatWidget) {
+                document.querySelector('.chat-widget-button')?.remove();
+                document.querySelector('.chat-window')?.remove();
+            }
+
+            // 创建新的聊天组件实例，传入配置对象
+            chatWidget = new ChatWidget({
+                workspace: workspace,
+                username: username,
+                //apibase: apibase
+            });
+        });
+    </script>
+</body>
+</html> 
