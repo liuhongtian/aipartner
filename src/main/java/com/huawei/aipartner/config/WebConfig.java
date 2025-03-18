@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +12,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.huawei.aipartner.filter.UserAuthFilter;
+import com.huawei.aipartner.interceptor.LoggingInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer, EnvironmentAware {
 
     private Environment env;
+    
+    @Autowired
+    private LoggingInterceptor loggingInterceptor;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -41,6 +47,13 @@ public class WebConfig implements WebMvcConfigurer, EnvironmentAware {
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true);
+    }
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册日志拦截器，拦截所有API请求
+        registry.addInterceptor(loggingInterceptor)
+                .addPathPatterns("/api/**");
     }
     
     @Bean
