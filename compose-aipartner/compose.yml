@@ -11,5 +11,6 @@ services:
       - "8080:8080"
     restart: always
     volumes:
-      - .:/jars
-    command: ["-Xmx1024m", "-jar", "/jars/aipartner-0.0.1-SNAPSHOT.jar"]
+      - ./jars:/jars
+      - ./db:/db
+    command: ["-Dfile.encoding=utf-8", "-Xmx1024m", "-jar", "/jars/aipartner-0.0.1-SNAPSHOT.jar"]

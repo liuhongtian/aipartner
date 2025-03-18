@@ -1,0 +1,1 @@
+CREATE TABLE access_log (log_id VARCHAR(40), uid VARCHAR(36), request_uri VARCHAR(200), request_method VARCHAR(10), client_ip VARCHAR(20), handler_info VARCHAR(80), params VARCHAR(400), response_status INTEGER, request_time VARCHAR(40), response_time VARCHAR(40),proc_time INTEGER,request_content VARCHAR(2500), response_content  VARCHAR(2500));

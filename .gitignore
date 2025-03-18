@@ -42,3 +42,5 @@ dist/
 **/.DS_Store
 **/._*
 
+access_log.sqlite
+access_log.sqlite-journal

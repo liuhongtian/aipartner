@@ -52,7 +52,11 @@ public class OpenAIController {
             @PathVariable String model,
             @RequestBody ChatRequest chatRequest,
             @RequestParam(value = "UID", required = true) String uid) {
-        return chatService.chat(model, preprocessChatRequest(chatRequest, uid));
+            var preprocessedChatRequest = preprocessChatRequest(chatRequest, uid);
+            var response = chatService.chat(model, preprocessedChatRequest);
+            redisTemplate.opsForValue().set(uid + ".report.data", preprocessedChatRequest.toString());
+            redisTemplate.opsForValue().set(uid + ".report.response", response.getBody()==null?"":response.getBody().toString());
+        return response;
     }
 
     /**
