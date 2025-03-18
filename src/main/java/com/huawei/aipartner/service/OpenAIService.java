@@ -139,7 +139,12 @@ public class OpenAIService {
                 });
     }
 
-    // TODO 发起Function Calling请求到LLM
+    /**
+     * 发起Function Calling请求到LLM
+     * @param model
+     * @param chatRequest
+     * @return
+     */
     public ResponseEntity<ChatResponse> functionCalling(String model, ChatRequest chatRequest) {
         System.out.println("chatRequest: " + chatRequest.getMessages().get(1).getContent());
         // 构建请求头
