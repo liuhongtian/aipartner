@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,9 @@ public class OpenAIService {
     private String openAIApiKey;
 
     @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
     FunctionService functionService;
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -46,7 +50,7 @@ public class OpenAIService {
                 .build();
     }
 
-    public ResponseEntity<ChatResponse> chat(String model, ChatRequest chatRequest) {
+    public ResponseEntity<ChatResponse> chat(String uid, String model, ChatRequest chatRequest) {
         System.out.println("chatRequest: " + chatRequest.getMessages().get(1).getContent());
         // 构建请求头
         HttpHeaders headers = new HttpHeaders();
@@ -58,6 +62,9 @@ public class OpenAIService {
         llmRequest.setModel(model);
         llmRequest.setMessages(chatRequest.getMessages());
         llmRequest.setStream(false);
+        redisTemplate.opsForValue().set(uid + ".chat.request", llmRequest.toString());
+        redisTemplate.expire(uid + ".chat.request", 1, java.util.concurrent.TimeUnit.DAYS);
+
         // 发送请求到 openAI
         HttpEntity<OpenAIRequest> request = new HttpEntity<>(llmRequest, headers);
         String url = openAIBaseUrl + "/v1/chat/completions";
@@ -72,6 +79,9 @@ public class OpenAIService {
             if (rawResponse.getBody() != null) {
                 try {
                     System.out.println("openaiResponse: " + rawResponse.getBody());
+                    redisTemplate.opsForValue().set(uid + ".chat.response", rawResponse.getBody()==null?"":rawResponse.getBody());
+                    redisTemplate.expire(uid + ".chat.response", 1, java.util.concurrent.TimeUnit.DAYS);
+
                     OpenAIResponse openaiResponse = objectMapper.readValue(rawResponse.getBody(), OpenAIResponse.class);
                     chatResponse.setMessages(Stream.of(openaiResponse.getChoices()).map(c -> c.getMessage().parseContent()).toList());
                     return new ResponseEntity<>(chatResponse, HttpStatus.OK);

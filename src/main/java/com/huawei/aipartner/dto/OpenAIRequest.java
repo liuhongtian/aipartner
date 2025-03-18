@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.huawei.aipartner.entity.FunctionDefinition;
+import com.huawei.aipartner.utils.JsonUtils;
 
 import lombok.Data;
 
@@ -26,4 +27,8 @@ public class OpenAIRequest {
     
     @JsonProperty("frequency_penalty")
     private Double frequencyPenalty = 0.0;
+
+    public String toString() {
+        return JsonUtils.toJson(this);
+    }
 }

@@ -90,12 +90,8 @@ public class LoggingInterceptor implements HandlerInterceptor {
             // 也输出到控制台
             System.out.println("API访问日志: " + logContent);
 
-            String request_content = "";
-            String response_content = "";
-            if (request.getRequestURI().startsWith("/api/openai/report/")) {
-                request_content = redisTemplate.opsForValue().get(request.getParameter("UID") + ".report.data");
-                response_content = redisTemplate.opsForValue().get(request.getParameter("UID") + ".report.response");
-            }
+            String request_content = redisTemplate.opsForValue().get(request.getParameter("UID") + ".chat.request");
+            String response_content = redisTemplate.opsForValue().get(request.getParameter("UID") + ".chat.response");
 
             // 将日志写入数据库
             writeToDatabase(logId, request.getParameter("UID"),

@@ -1,5 +1,7 @@
 package com.huawei.aipartner.dto;
 
+import com.huawei.aipartner.utils.JsonUtils;
+
 import lombok.Data;
 
 @Data
@@ -11,4 +13,8 @@ public class OpenAIResponse {
     private Choice[] choices;
     private Usage usage;
     private String system_fingerprint;
+
+    public String toString() {
+        return JsonUtils.toJson(this);
+    }
 }

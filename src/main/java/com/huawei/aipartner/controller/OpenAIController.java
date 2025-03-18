@@ -35,8 +35,9 @@ public class OpenAIController {
     @PostMapping("/chat/{model}")
     public ResponseEntity<ChatResponse> chat(
             @PathVariable String model,
-            @RequestBody ChatRequest chatRequest) {
-        return chatService.chat(model, chatRequest);
+            @RequestBody ChatRequest chatRequest,
+            @RequestParam(value = "UID", required = true) String uid) {
+        return chatService.chat(uid, model, chatRequest);
     }
 
     /**
@@ -52,11 +53,7 @@ public class OpenAIController {
             @PathVariable String model,
             @RequestBody ChatRequest chatRequest,
             @RequestParam(value = "UID", required = true) String uid) {
-            var preprocessedChatRequest = preprocessChatRequest(chatRequest, uid);
-            var response = chatService.chat(model, preprocessedChatRequest);
-            redisTemplate.opsForValue().set(uid + ".report.data", preprocessedChatRequest.toString());
-            redisTemplate.opsForValue().set(uid + ".report.response", response.getBody()==null?"":response.getBody().toString());
-        return response;
+        return chatService.chat(uid, model, preprocessChatRequest(chatRequest, uid));
     }
 
     /**
@@ -66,19 +63,19 @@ public class OpenAIController {
      * @return 预处理后的用户请求
      */
     private ChatRequest preprocessChatRequest(ChatRequest chatRequest, String uid) {
-        //从redis获取数据
+        // 从redis获取数据
         String data = redisTemplate.opsForValue().get(uid + ".report.data");
 
         data = data == null ? "" : data;
 
         // 添加用户数据
-        String userPrompt = "请根据待分析报表数据进行数据分析，生成智慧报表。" + chatRequest.getMessages().stream().filter(n -> n.getRole().equals("user")).findFirst().get().getContent() + "\n待分析报表数据：" + data;
-        
+        String userPrompt = "请根据待分析报表数据进行数据分析，生成智慧报表。" + chatRequest.getMessages().stream()
+                .filter(n -> n.getRole().equals("user")).findFirst().get().getContent() + "\n待分析报表数据：" + data;
+
         // 添加系统提示词
         chatRequest.setMessages(new ArrayList<>(Arrays.asList(
-            new Message("system", SYSTEM_PROMPT),
-            new Message("user", userPrompt)
-        )));
+                new Message("system", SYSTEM_PROMPT),
+                new Message("user", userPrompt))));
 
         return chatRequest;
     }
