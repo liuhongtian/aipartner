@@ -34,6 +34,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+        if ("OPTIONS".equals(request.getMethod().toUpperCase())) {
+            return true;
+        }
         // 将请求开始时间放入请求属性中，用于后续计算请求处理时间
         request.setAttribute("startTime", System.currentTimeMillis());
         return true;
@@ -48,6 +51,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
+        if ("OPTIONS".equals(request.getMethod().toUpperCase())) {
+            return;
+        }
+
         try {
             // 计算请求处理时间
             long startTime = (Long) request.getAttribute("startTime");
