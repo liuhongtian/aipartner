@@ -29,4 +29,13 @@ public class Message {
         return this;
     }
 
+    public Message() {
+        
+    }
+
+    public Message(String role, String content) {
+        this.role = role;
+        this.content = content;
+    }
+
 }

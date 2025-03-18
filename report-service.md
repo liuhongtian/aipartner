@@ -32,18 +32,69 @@
 
 |URI|HTTP方法|说明|
 |---|---|---|
-|/api/report/data|POST|智能报表数据接口|
+|/api/context/report/data|POST|智能报表数据接口|
 |/api/openai/chat/deepseek-chat|POST|智能报表分析接口|
 
 ## 接口详细说明
 
+### 用户验证
+
+使用请求参数 **UID** 验证用户身份，验证失败时使用HTTP状态码进行标识：
+
+- 401：缺少验证信息（没有UID请求参数）。
+- 403：验证码无效，或者UID格式错误。
+
 ### 智能报表数据接口
+
+[http://www.liuhongtian.com:8080/api/context/report/data?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc](http://www.liuhongtian.com:8080/api/context/report/data?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc)
+
+请求报文格式没需求。
 
 ### 智能报表分析接口
 
+[http://www.liuhongtian.com:8080/api/openai/report/deepseek-chat?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc](http://www.liuhongtian.com:8080/api/openai/report/deepseek-chat?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc)
 
+请求报文：
 
-## 彭总的需求文档内容
+```json
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "请对用户年龄进行分析，生成柱状图并做统计分析。"
+        }
+    ]
+}
+```
+
+响应报文：
+
+```json
+{
+    "messages": [
+        {
+            "role": "assistant",
+            "content": "<p>根据提供的用户年龄数据，我们可以进行以下统计分析：</p>\n<ol>\n<li><strong>年龄分布</strong>：用户的年龄范围从20岁到68岁。</li>\n<li><strong>平均年龄</strong>：计算所有用户的平均年龄。</li>\n<li><strong>年龄中位数</strong>：找出年龄的中位数。</li>\n<li><strong>年龄众数</strong>：找出出现频率最高的年龄。</li>\n<li><strong>年龄标准差</strong>：计算年龄的标准差，了解年龄分布的离散程度。</li>\n</ol>\n<p>首先，我们计算这些统计量：</p>\n<ul>\n<li><strong>平均年龄</strong>：将所有年龄相加后除以人数。</li>\n<li><strong>年龄中位数</strong>：将所有年龄按大小顺序排列，位于中间位置的年龄。</li>\n<li><strong>年龄众数</strong>：出现次数最多的年龄。</li>\n<li><strong>年龄标准差</strong>：计算每个年龄与平均年龄的差的平方的平均数，再开平方。</li>\n</ul>\n<p>接下来，我们将生成一个柱状图来展示年龄的分布情况。以下是使用Chart.js生成的HTML页面代码：</p>\n<script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n    <div style=\"width: 70%; margin: auto;\">\n        <canvas id=\"ageChart\"></canvas>\n    </div>\n    <script>\n        var ctx = document.getElementById('ageChart').getContext('2d');\n        var ageChart = new Chart(ctx, {\n            type: 'bar',\n            data: {\n                labels: ['20', '21', '22', '23', '25', '28', '32', '40', '45', '50', '56', '58', '60', '68'],\n                datasets: [{\n                    label: '年龄分布',\n                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 每个年龄出现的次数\n                    backgroundColor: 'rgba(54, 162, 235, 0.2)',\n                    borderColor: 'rgba(54, 162, 235, 1)',\n                    borderWidth: 1\n                }]\n            },\n            options: {\n                scales: {\n                    y: {\n                        beginAtZero: true\n                    }\n                }\n            }\n        });\n    </script>\n\n\n<p>在这个HTML页面中，我们使用了Chart.js库来创建一个柱状图，展示了每个年龄的用户数量。每个柱代表一个特定的年龄，柱的高度表示该年龄的用户数量。这个图表帮助我们直观地看到用户年龄的分布情况。</p>\n<p>请注意，由于数据中每个年龄只出现一次，所以柱状图中的每个柱的高度都是1。如果有更多数据，柱的高度会相应变化，反映出不同年龄的用户数量。</p>\n",
+            "tool_calls": null
+        }
+    ],
+    "error": null
+}
+```
+
+从响应报文中提取出 **messages[0].content** 的内容，直接嵌入到页面就可以了。注意图表是用 **Chat.js** 生成的，请预先自行引入脚本，例如：
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+```
+
+或者：
+
+```html
+<script src="http://www.liuhongtian.com:8080/js/chart.js"></script>
+```
+
+## 原始需求文档
 
 ### 一 需求描述
 
@@ -65,7 +116,7 @@
 #### AI报表接口要求
 
 1. 接口需要有安全验证
-2. 需要自动记录上下文件
+2. 需要自动记录上下文
 3. 首次进入时，自动提交页面数据
 
 ### 三 开发文档

@@ -13,3 +13,12 @@ anythingllm:
 
 cors:
   allowed-origin-patterns: http://localhost:*,https://localhost:*,http://*:*,https://*:*,http://svr39.bjhwsj.com
+
+spring:
+  data:
+    redis:
+      host: redis
+      port: 6379
+      # password: # 如果有密码，请取消注释并设置密码
+      database: 0
+      timeout: 10000

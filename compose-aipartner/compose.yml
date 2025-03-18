@@ -1,4 +1,10 @@
 services:
+  redis:
+    image: redis
+    ports:
+      - "6379"
+    restart: always
+
   aipartner:
     image: hwjdk:21
     ports:
@@ -6,4 +12,4 @@ services:
     restart: always
     volumes:
       - .:/jars
-    command: ["-Xmx1024m", "-jar", "/jars/aipartner.jar"]
+    command: ["-Xmx1024m", "-jar", "/jars/aipartner-0.0.1-SNAPSHOT.jar"]
