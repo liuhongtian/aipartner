@@ -38,33 +38,33 @@ public class YamlUtils {
     /**
      * 从类路径加载 YAML 文件并转换为指定类型的对象
      *
-     * @param path 类路径下的文件路径
+     * @param path  类路径下的文件路径
      * @param clazz 目标类型
      * @return 转换后的对象，如果加载或转换失败则返回 null
      */
-    /*
+
     public static <T> T loadYamlAsObject(String path, Class<T> clazz) {
         try (InputStream inputStream = new ClassPathResource(path).getInputStream()) {
-            Yaml yaml = new Yaml(new Constructor(clazz));
+            Yaml yaml = new Yaml(new Constructor(clazz, null));
             return yaml.load(inputStream);
         } catch (IOException | YAMLException e) {
             logger.error("从类路径加载 YAML 文件并转换为对象时发生错误: {}", e.getMessage());
             return null;
         }
-    } */
+    }
 
     /**
      * 从类路径加载包含多个文档的 YAML 文件并转换为指定类型的对象列表
      *
-     * @param path 类路径下的文件路径
+     * @param path  类路径下的文件路径
      * @param clazz 目标类型
      * @return 转换后的对象列表，如果加载或转换失败则返回空列表
      */
-    /*
+
     public static <T> List<T> loadAllYamlDocuments(String path, Class<T> clazz) {
         List<T> results = new ArrayList<>();
         try (InputStream inputStream = new ClassPathResource(path).getInputStream()) {
-            Yaml yaml = new Yaml(new Constructor(clazz));
+            Yaml yaml = new Yaml(new Constructor(clazz, null));
             Iterable<Object> objects = yaml.loadAll(inputStream);
             for (Object obj : objects) {
                 if (clazz.isInstance(obj)) {
@@ -76,12 +76,12 @@ public class YamlUtils {
             logger.error("从类路径加载多文档 YAML 文件时发生错误: {}", e.getMessage());
             return results;
         }
-    } */
+    }
 
     /**
      * 从类路径加载 YAML 文件并转换为指定类型的对象列表
      *
-     * @param path 类路径下的文件路径
+     * @param path         类路径下的文件路径
      * @param elementClass List 元素类型
      * @return 转换后的对象列表，如果加载或转换失败则返回 null
      */
@@ -113,7 +113,7 @@ public class YamlUtils {
      * 获取 YAML 文件中指定路径的值
      *
      * @param yamlMap YAML 文件加载的 Map
-     * @param path 点分隔的路径，例如 "spring.datasource.url"
+     * @param path    点分隔的路径，例如 "spring.datasource.url"
      * @return 指定路径的值，如果路径不存在则返回 null
      */
     @SuppressWarnings("unchecked")
