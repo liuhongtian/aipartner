@@ -1,10 +1,6 @@
 package com.huawei.aipartner.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -13,7 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import com.huawei.aipartner.dto.ChatRequest;
 import com.huawei.aipartner.dto.ChatResponse;
 import com.huawei.aipartner.dto.Message;
+import com.huawei.aipartner.dto.MessageWithData;
+import com.huawei.aipartner.service.ContextService;
 import com.huawei.aipartner.service.OpenAIService;
+import com.huawei.aipartner.utils.JsonUtils;
 
 import reactor.core.publisher.Flux;
 
@@ -21,16 +20,11 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/api/openai")
 public class OpenAIController {
 
-    private static final String SYSTEM_PROMPT = "你是一个专业的数据分析师，擅长根据数据生成智慧报表。请在回答中提供文字描述，如果回答中有图形输出的需求，请提供一个完整的html页面，在其中使用chart.js生成图形，图形中应该包含图例，图形应包含全部图形内容，宽度不超过页面宽度的70%。";
+    @Autowired
+    private OpenAIService chatService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
-    private final OpenAIService chatService;
-
-    public OpenAIController(OpenAIService chatService) {
-        this.chatService = chatService;
-    }
+    private ContextService contextService;
 
     @PostMapping("/chat/{model}")
     public ResponseEntity<ChatResponse> chat(
@@ -38,6 +32,68 @@ public class OpenAIController {
             @RequestBody ChatRequest chatRequest,
             @RequestParam(value = "UID", required = true) String uid) {
         return chatService.chat(uid, model, chatRequest);
+    }
+
+    /**
+     * 智能报表分析（用户请求中可能包含报表数据）
+     * 
+     * @param messageWithData 用户消息
+     * @param uid             用户ID
+     * @return 分析结果
+     */
+    @PostMapping("/reportwithdata")
+    public ResponseEntity<ChatResponse> reportWithData(
+            @RequestBody MessageWithData messageWithData,
+            @RequestParam(value = "UID", required = true) String uid) {
+
+        // 上报数据（如果有数据）
+        if (messageWithData.getData() != null && !messageWithData.getData().isEmpty()) {
+            contextService.reportData(uid, messageWithData.getData());
+        }
+
+        ChatRequest chatRequest = new ChatRequest();
+
+        // 添加用户消息
+        if (messageWithData.getMessage() != null && !messageWithData.getMessage().isEmpty()) {
+            chatRequest.getMessages().add(new Message("user", messageWithData.getMessage()));
+        }
+
+        // 智能报表分析
+        return chatService.chat(uid, "deepseek-chat", chatService.preprocessReportChatRequest(chatRequest, uid));
+    }
+
+    /**
+     * 智能报表分析（用户请求中可能包含报表数据），此接口不校验Content-Type
+     * 
+     * @param messageWithData 用户消息
+     * @param uid             用户ID
+     * @return 分析结果
+     */
+    @PostMapping("/reportwithdata/raw")
+    public ResponseEntity<ChatResponse> reportWithDataRaw(
+            @RequestBody String messageWithDataString,
+            @RequestParam(value = "UID", required = true) String uid) {
+        var messageWithData = JsonUtils.fromJson(messageWithDataString, MessageWithData.class);
+        if (messageWithData == null) {
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setError("请求格式错误");
+            return ResponseEntity.badRequest().body(chatResponse);
+        }
+
+        // 上报数据（如果有数据）
+        if (messageWithData.getData() != null && !messageWithData.getData().isEmpty()) {
+            contextService.reportData(uid, messageWithData.getData());
+        }
+
+        ChatRequest chatRequest = new ChatRequest();
+
+        // 添加用户消息
+        if (messageWithData.getMessage() != null && !messageWithData.getMessage().isEmpty()) {
+            chatRequest.getMessages().add(new Message("user", messageWithData.getMessage()));
+        }
+
+        // 智能报表分析
+        return chatService.chat(uid, "deepseek-chat", chatService.preprocessReportChatRequest(chatRequest, uid));
     }
 
     /**
@@ -53,31 +109,7 @@ public class OpenAIController {
             @PathVariable String model,
             @RequestBody ChatRequest chatRequest,
             @RequestParam(value = "UID", required = true) String uid) {
-        return chatService.chat(uid, model, preprocessChatRequest(chatRequest, uid));
-    }
-
-    /**
-     * 预处理用户请求，添加系统提示词以及用户数据（存储在redis中）。
-     * 
-     * @param chatRequest 用户请求
-     * @return 预处理后的用户请求
-     */
-    private ChatRequest preprocessChatRequest(ChatRequest chatRequest, String uid) {
-        // 从redis获取数据
-        String data = redisTemplate.opsForValue().get(uid + ".report.data");
-
-        data = data == null ? "" : data;
-
-        // 添加用户数据
-        String userPrompt = "请根据待分析报表数据进行数据分析，生成智慧报表。" + chatRequest.getMessages().stream()
-                .filter(n -> n.getRole().equals("user")).findFirst().get().getContent() + "\n待分析报表数据：" + data;
-
-        // 添加系统提示词
-        chatRequest.setMessages(new ArrayList<>(Arrays.asList(
-                new Message("system", SYSTEM_PROMPT),
-                new Message("user", userPrompt))));
-
-        return chatRequest;
+        return chatService.chat(uid, model, chatService.preprocessReportChatRequest(chatRequest, uid));
     }
 
     // Function

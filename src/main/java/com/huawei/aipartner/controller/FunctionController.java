@@ -1,7 +1,7 @@
 package com.huawei.aipartner.controller;
 
-import com.huawei.aipartner.entity.FunctionCall;
-import com.huawei.aipartner.entity.FunctionDefinition;
+import com.huawei.aipartner.dto.FunctionCall;
+import com.huawei.aipartner.dto.FunctionDefinition;
 import com.huawei.aipartner.service.FunctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

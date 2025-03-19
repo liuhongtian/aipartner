@@ -3,7 +3,6 @@ package com.huawei.aipartner.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.huawei.aipartner.entity.FunctionDefinition;
 import com.huawei.aipartner.utils.JsonUtils;
 
 import lombok.Data;

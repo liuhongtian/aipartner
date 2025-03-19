@@ -1,4 +1,4 @@
-package com.huawei.aipartner.entity;
+package com.huawei.aipartner.dto;
 
 import java.util.Map;
 import lombok.Data;
