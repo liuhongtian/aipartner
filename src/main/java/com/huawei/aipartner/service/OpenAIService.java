@@ -44,7 +44,7 @@ public class OpenAIService {
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    FunctionService functionService;
+    private FunctionService functionService;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final WebClient webClient;

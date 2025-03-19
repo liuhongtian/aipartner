@@ -1,5 +1,7 @@
 package com.huawei.aipartner.dto;
 
+import java.util.ArrayList;
+
 import com.huawei.aipartner.utils.JsonUtils;
 
 /**
@@ -7,6 +9,10 @@ import com.huawei.aipartner.utils.JsonUtils;
  */ 
 public class ChatRequest {
     private java.util.List<Message> messages;
+
+    public ChatRequest() {
+        this.messages = new ArrayList<Message>();
+    }
 
     public java.util.List<Message> getMessages() {
         return messages;

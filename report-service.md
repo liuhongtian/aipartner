@@ -33,7 +33,8 @@
 |URI|HTTP方法|说明|
 |---|---|---|
 |/api/context/report/data|POST|智能报表数据接口|
-|/api/openai/chat/deepseek-chat|POST|智能报表分析接口|
+|/api/openai/report/deepseek-chat|POST|智能报表分析接口|
+|/api/openai/reportwithdata|智能报表数据及分析接口（前两接口组合）|
 
 ## 接口详细说明
 
@@ -92,6 +93,45 @@
 
 ```html
 <script src="http://www.liuhongtian.com:8080/js/chart.js"></script>
+```
+
+### 智能报表数据及分析接口
+
+[http://www.liuhongtian.com:8080/api/openai/reportwithdatta?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc](http://www.liuhongtian.com:8080/api/openai/reportwithdata?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc)
+
+请求报文：
+
+```json
+{
+    "message": "请对用户年龄进行分析，生成饼图并做统计分析。",
+    "data": "<table><thead><tr><td>姓名</td><td>年龄</td></tr></thead<tbody><tr><td>张三</td><td>20</td></tr><tr><td>李四</td><td>21</td></tr><tr><td>王五</td><td>22</td></tr><tr><td>李二狗</td><td>40</td></tr><tr><td>赵四</td><td>58</td></tr><tr><td>赵玉田</td><td>32</td></tr><tr><td>谢广坤</td><td>56</td></tr><tr><td>刘能</td><td>60</td></tr><tr><td>西门长海</td><td>68</td></tr><tr><td>谢大脚</td><td>45</td></tr><tr><td>王大拿</td><td>50</td></tr><tr><td>谢飞机</td><td>28</td></tr<tr><td>谢腾飞</td><td>25</td></tr><tr><td>谢腾凤</td><td>23</td></tr></tbody></table>"
+}
+```
+
+> 请求报文里的 **message** （用户输入的消息）和 **data** （待分析数据）都是可选的。
+
+根据请求报文的具体情况，接口将做如下处理：
+
+- data存在，message不存在：将data缓存到redis，并使用系统内置提示词请求deepseek进行分析，返回分析结果。
+- data不存在，message存在：从redis获取待分析数据，并将message附加到系统内置提示词请求deepseek进行分析，返回分析结果。
+- data和message都存在：将data缓存到redis，并将message附加到系统内置提示词请求deepseek进行分析，返回分析结果。
+- data和message都不存在：从redis获取待分析数据，并使用系统内置提示词请求deepseek进行分析，返回分析结果。
+
+> 无论如何都将进行报表分析。
+
+响应报文：
+
+```json
+{
+    "messages": [
+        {
+            "role": "assistant",
+            "content": "<p>根据提供的报表数据，我们可以进行以下数据分析：</p>\n<ol>\n<li>\n<p><strong>年龄分布分析</strong>：</p>\n<ul>\n<li>最小年龄：20岁（张三）</li>\n<li>最大年龄：68岁（西门长海）</li>\n<li>平均年龄：约39.5岁</li>\n<li>年龄中位数：40岁（李二狗）</li>\n</ul>\n</li>\n<li>\n<p><strong>年龄分段统计</strong>：</p>\n<ul>\n<li>20-29岁：5人（张三、王五、谢飞机、谢腾飞、谢腾凤）</li>\n<li>30-39岁：1人（赵玉田）</li>\n<li>40-49岁：2人（李二狗、谢大脚）</li>\n<li>50-59岁：3人（赵四、谢广坤、王大拿）</li>\n<li>60岁以上：2人（刘能、西门长海）</li>\n</ul>\n</li>\n<li>\n<p><strong>年龄分布图表</strong>：\n为了更直观地展示年龄分布，我们可以使用柱状图来展示不同年龄段的分布情况。</p>\n</li>\n</ol>\n<p>以下是使用Chart.js生成的HTML页面代码，展示年龄分布的柱状图：</p>\n<script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n    <div style=\"width: 70%; margin: auto;\">\n        <canvas id=\"ageDistributionChart\"></canvas>\n    </div>\n    <script>\n        var ctx = document.getElementById('ageDistributionChart').getContext('2d');\n        var ageDistributionChart = new Chart(ctx, {\n            type: 'bar',\n            data: {\n                labels: ['20-29岁', '30-39岁', '40-49岁', '50-59岁', '60岁以上'],\n                datasets: [{\n                    label: '人数',\n                    data: [5, 1, 2, 3, 2],\n                    backgroundColor: [\n                        'rgba(255, 99, 132, 0.2)',\n                        'rgba(54, 162, 235, 0.2)',\n                        'rgba(255, 206, 86, 0.2)',\n                        'rgba(75, 192, 192, 0.2)',\n                        'rgba(153, 102, 255, 0.2)'\n                    ],\n                    borderColor: [\n                        'rgba(255, 99, 132, 1)',\n                        'rgba(54, 162, 235, 1)',\n                        'rgba(255, 206, 86, 1)',\n                        'rgba(75, 192, 192, 1)',\n                        'rgba(153, 102, 255, 1)'\n                    ],\n                    borderWidth: 1\n                }]\n            },\n            options: {\n                scales: {\n                    y: {\n                        beginAtZero: true\n                    }\n                }\n            }\n        });\n    </script>\n\n\n<h3>数据分析结论：</h3>\n<ul>\n<li>数据中年龄分布较为广泛，从20岁到68岁不等。</li>\n<li>20-29岁年龄段的人数最多，占总人数的约38.5%。</li>\n<li>60岁以上年龄段的人数较少，占总人数的约15.4%。</li>\n<li>平均年龄和中位数年龄接近，说明数据分布较为均匀。</li>\n</ul>\n<p>通过以上分析和图表展示，可以更清晰地了解数据的年龄分布情况。</p>\n",
+            "tool_calls": null
+        }
+    ],
+    "error": null
+}
 ```
 
 ## 原始需求文档

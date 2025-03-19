@@ -1,7 +1,5 @@
 package com.huawei.aipartner.controller;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.huawei.aipartner.dto.ChatRequest;
 import com.huawei.aipartner.dto.ChatResponse;
-import com.huawei.aipartner.dto.Message;
 import com.huawei.aipartner.service.ContextService;
 import com.huawei.aipartner.service.OpenAIService;
 
@@ -52,7 +49,6 @@ public class ContextConroller {
         contextService.reportData(uid, data);
 
         ChatRequest chatRequest = new ChatRequest();
-        chatRequest.setMessages(new ArrayList<Message>());
         var reportResponse = chatService.chat(uid, "deepseek-chat", chatService.preprocessReportChatRequest(chatRequest, uid));
         return reportResponse;
     }
