@@ -1,7 +1,7 @@
 package com.huawei.aipartner.service;
 
-import com.huawei.aipartner.entity.FunctionCall;
-import com.huawei.aipartner.entity.FunctionDefinition;
+import com.huawei.aipartner.dto.FunctionCall;
+import com.huawei.aipartner.dto.FunctionDefinition;
 import com.huawei.aipartner.functions.CallableFunction;
 import com.huawei.aipartner.utils.JsonUtils;
 import com.huawei.aipartner.utils.YamlUtils;

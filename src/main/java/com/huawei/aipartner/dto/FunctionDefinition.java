@@ -1,4 +1,4 @@
-package com.huawei.aipartner.entity;
+package com.huawei.aipartner.dto;
 
 import java.util.List;
 import java.util.Map;
