@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huawei.aipartner.dto.ChatRequest;
+import com.huawei.aipartner.dto.ChatResponse;
 import com.huawei.aipartner.dto.Message;
 import com.huawei.aipartner.service.ContextService;
 import com.huawei.aipartner.service.OpenAIService;
@@ -35,16 +36,25 @@ public class ContextConroller {
     public ResponseEntity<String> reportData(
             @RequestBody String data,
             @RequestParam(value = "UID", required = true) String uid) {
-        var response = contextService.reportData(uid, data);
+        return contextService.reportData(uid, data);
+    }
 
-        /* 用户上报数据后，就调用AI生成报表（此处理存疑！）
+    /**
+     * 上报数据，数据存储在Redis中，key为{UID}.report.data
+     * @param data 上报的数据内容
+     * @param uid 用户ID
+     * @return 处理结果
+     */
+    @PostMapping("/report/dataandchat")
+    public ResponseEntity<ChatResponse> reportDataAndChat(
+            @RequestBody String data,
+            @RequestParam(value = "UID", required = true) String uid) {
+        contextService.reportData(uid, data);
+
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setMessages(new ArrayList<Message>());
         var reportResponse = chatService.chat(uid, "deepseek-chat", chatService.preprocessReportChatRequest(chatRequest, uid));
         return reportResponse;
-        */
-        
-        return response;
     }
 
 }
