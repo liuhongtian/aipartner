@@ -1,7 +1,5 @@
 package com.huawei.aipartner.controller;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +12,7 @@ import com.huawei.aipartner.dto.Message;
 import com.huawei.aipartner.dto.MessageWithData;
 import com.huawei.aipartner.service.ContextService;
 import com.huawei.aipartner.service.OpenAIService;
+import com.huawei.aipartner.utils.JsonUtils;
 
 import reactor.core.publisher.Flux;
 
@@ -26,7 +25,6 @@ public class OpenAIController {
 
     @Autowired
     private ContextService contextService;
-
 
     @PostMapping("/chat/{model}")
     public ResponseEntity<ChatResponse> chat(
@@ -49,14 +47,49 @@ public class OpenAIController {
             @RequestParam(value = "UID", required = true) String uid) {
 
         // 上报数据（如果有数据）
-        if(messageWithData.getData() != null && !messageWithData.getData().isEmpty()) {
+        if (messageWithData.getData() != null && !messageWithData.getData().isEmpty()) {
             contextService.reportData(uid, messageWithData.getData());
         }
 
         ChatRequest chatRequest = new ChatRequest();
 
         // 添加用户消息
-        if(messageWithData.getMessage() != null && !messageWithData.getMessage().isEmpty()) {
+        if (messageWithData.getMessage() != null && !messageWithData.getMessage().isEmpty()) {
+            chatRequest.getMessages().add(new Message("user", messageWithData.getMessage()));
+        }
+
+        // 智能报表分析
+        return chatService.chat(uid, "deepseek-chat", chatService.preprocessReportChatRequest(chatRequest, uid));
+    }
+
+    /**
+     * 智能报表分析（用户请求中可能包含报表数据），此接口不校验Content-Type
+     * 
+     * @param messageWithData 用户消息
+     * @param uid             用户ID
+     * @return 分析结果
+     */
+    @PostMapping("/reportwithdata/raw")
+    public ResponseEntity<ChatResponse> reportWithDataRaw(
+            @RequestBody String messageWithDataString,
+            @RequestParam(value = "UID", required = true) String uid) {
+        System.out.println("reportWithDataRaw: " + messageWithDataString.substring(0, messageWithDataString.length() > 200 ? 200 : messageWithDataString.length()));
+        var messageWithData = JsonUtils.fromJson(messageWithDataString, MessageWithData.class);
+        if (messageWithData == null) {
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setError("请求格式错误");
+            return ResponseEntity.badRequest().body(chatResponse);
+        }
+
+        // 上报数据（如果有数据）
+        if (messageWithData.getData() != null && !messageWithData.getData().isEmpty()) {
+            contextService.reportData(uid, messageWithData.getData());
+        }
+
+        ChatRequest chatRequest = new ChatRequest();
+
+        // 添加用户消息
+        if (messageWithData.getMessage() != null && !messageWithData.getMessage().isEmpty()) {
             chatRequest.getMessages().add(new Message("user", messageWithData.getMessage()));
         }
 

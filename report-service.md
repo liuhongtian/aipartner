@@ -34,7 +34,7 @@
 |---|---|---|
 |/api/context/report/data|POST|智能报表数据接口|
 |/api/openai/report/deepseek-chat|POST|智能报表分析接口|
-|/api/openai/reportwithdata|智能报表数据及分析接口（前两接口组合）|
+|/api/openai/reportwithdata|POST|智能报表数据及分析接口（前两接口组合）|
 
 ## 接口详细说明
 
@@ -97,7 +97,7 @@
 
 ### 智能报表数据及分析接口
 
-[http://www.liuhongtian.com:8080/api/openai/reportwithdatta?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc](http://www.liuhongtian.com:8080/api/openai/reportwithdata?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc)
+[http://www.liuhongtian.com:8080/api/openai/reportwithdata?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc](http://www.liuhongtian.com:8080/api/openai/reportwithdata?UID=68c5ae71-e485-49ff-92c1-ddd29d4d12dc)
 
 请求报文：
 
