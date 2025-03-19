@@ -1,5 +1,7 @@
 package com.huawei.aipartner.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.aipartner.dto.OpenAIRequest;
 import com.huawei.aipartner.dto.ChatRequest;
 import com.huawei.aipartner.dto.ChatResponse;
+import com.huawei.aipartner.dto.Message;
 import com.huawei.aipartner.dto.OpenAIResponse;
 
 @Service
 public class OpenAIService {
+
+    private static final String REPORT_SYSTEM_PROMPT = "你是一个专业的数据分析师，擅长根据数据生成智慧报表。请在回答中提供文字描述，如果回答中有图形输出的需求，请提供一个完整的html页面，在其中使用chart.js生成图形，图形中应该包含图例，图形应包含全部图形内容，宽度不超过页面宽度的70%。";
 
     @Value("${openai.base-url}")
     private String openAIBaseUrl;
@@ -49,6 +54,31 @@ public class OpenAIService {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
+
+    /**
+     * 预处理用户请求，添加系统提示词以及用户数据（存储在redis中）。
+     * 
+     * @param chatRequest 用户请求
+     * @return 预处理后的用户请求
+     */
+    public ChatRequest preprocessReportChatRequest(ChatRequest chatRequest, String uid) {
+        // 从redis获取数据
+        String data = redisTemplate.opsForValue().get(uid + ".report.data");
+
+        data = data == null ? "" : data;
+
+        // 添加用户数据
+        String userPrompt = "请根据待分析报表数据进行数据分析，生成智慧报表。" + chatRequest.getMessages().stream()
+                .filter(n -> n.getRole().equals("user")).findFirst().get().getContent() + "\n待分析报表数据：" + data;
+
+        // 添加系统提示词
+        chatRequest.setMessages(new ArrayList<>(Arrays.asList(
+                new Message("system", REPORT_SYSTEM_PROMPT),
+                new Message("user", userPrompt))));
+
+        return chatRequest;
+    }
+
 
     public ResponseEntity<ChatResponse> chat(String uid, String model, ChatRequest chatRequest) {
         System.out.println("chatRequest: " + chatRequest.getMessages().get(1).getContent());
