@@ -6,7 +6,7 @@ services:
     restart: always
 
   aipartner:
-    image: hwjdk:21
+    image: hwjdk:21-zh
     ports:
       - "8080:8080"
     restart: always

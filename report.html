@@ -1,0 +1,73 @@
+<html><body>
+    <p>根据提供的待分析报表数据，我们可以进行以下分析和统计：</p>
+<ol>
+<li>
+<p><strong>数据概览</strong>：</p>
+<ul>
+<li>数据包含多个字段，如<code>Mail_Box</code>, <code>Source_Name</code>, <code>Hasnewproduct</code>, <code>County_Name</code>, <code>LinkMan_Mail</code>, <code>LinkMan_WX</code>, <code>LinkMan_Mob</code>, <code>Shared</code>, <code>City_Name</code>, <code>rowId</code>, <code>Remark</code>, <code>Trans_Date</code>, <code>Hascontactreply</code>, <code>Post_Code</code>, <code>PK_ID</code>, <code>LinkMan_QQ</code>, <code>LinkMan_Tel</code>, <code>Custom_Code</code>, <code>Invoice_Title</code>, <code>Custom_Name</code>, <code>Province_Name</code>, <code>Area_Name</code>, <code>User_Desc</code>, <code>HasContract</code>。</li>
+<li>数据中存在大量“自定义转换方法不存在”的字段值，这可能意味着数据转换或处理过程中存在问题。</li>
+</ul>
+</li>
+<li>
+<p><strong>统计分析</strong>：</p>
+<ul>
+<li><strong>来源分析</strong>：我们可以分析<code>Source_Name</code>字段，看看数据主要来自哪些来源。</li>
+<li><strong>地区分布</strong>：通过<code>Province_Name</code>和<code>City_Name</code>字段，我们可以分析客户或数据的地区分布情况。</li>
+<li><strong>时间趋势</strong>：通过<code>Trans_Date</code>字段，我们可以分析数据的时间分布，看看是否有特定的时间趋势。</li>
+</ul>
+</li>
+<li>
+<p><strong>饼图生成</strong>：</p>
+<ul>
+<li>我们将生成一个饼图来展示<code>Source_Name</code>字段的分布情况。这将帮助我们了解数据的主要来源。</li>
+</ul>
+</li>
+</ol>
+<p>以下是使用Chart.js生成的饼图的HTML代码：</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div style="width: 70%; margin: auto;">
+        <canvas id="sourcePieChart"></canvas>
+    </div>
+    <script>
+        var ctx = document.getElementById('sourcePieChart').getContext('2d');
+        var sourcePieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['业务收集', '自有客户', '资源交换', '未知'],
+                datasets: [{
+                    label: 'Source Name Distribution',
+                    data: [3, 3, 1, 10], // 示例数据，需要根据实际数据调整
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Source Name Distribution'
+                    }
+                }
+            }
+        });
+    </script>
+
+
+<p><strong>注意</strong>：上述代码中的<code>data</code>数组是示例数据，需要根据实际数据中的<code>Source_Name</code>字段进行统计和调整。例如，如果“业务收集”出现了3次，那么在<code>data</code>数组中对应的值应该是3。</p>
+<p>通过这个饼图，我们可以直观地看到不同来源的数据占比，从而更好地理解数据的来源分布。</p>    
+</body></html>

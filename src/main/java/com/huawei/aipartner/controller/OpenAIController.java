@@ -73,7 +73,6 @@ public class OpenAIController {
     public ResponseEntity<ChatResponse> reportWithDataRaw(
             @RequestBody String messageWithDataString,
             @RequestParam(value = "UID", required = true) String uid) {
-        System.out.println("reportWithDataRaw: " + messageWithDataString.substring(0, messageWithDataString.length() > 200 ? 200 : messageWithDataString.length()));
         var messageWithData = JsonUtils.fromJson(messageWithDataString, MessageWithData.class);
         if (messageWithData == null) {
             ChatResponse chatResponse = new ChatResponse();

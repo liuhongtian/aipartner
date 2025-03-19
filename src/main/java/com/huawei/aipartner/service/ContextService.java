@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.huawei.aipartner.utils.JsonUtils;
+
 @Service
 public class ContextService {
     
@@ -21,6 +23,12 @@ public class ContextService {
      */
     public ResponseEntity<String> reportData(String uid, String data) {
         try {
+            // try to convert json to csv, to reduce tokens' count
+            var csvData = JsonUtils.jsonToCsv(data);
+            if (csvData != null && !csvData.isEmpty()) {
+                data = csvData;
+            }
+
             // 将数据存储在Redis中，key为uid + .report.data，value为data
             String datakey = uid + ".report.data";
             redisTemplate.opsForValue().set(datakey, data);
